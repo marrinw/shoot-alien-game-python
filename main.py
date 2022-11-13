@@ -4,44 +4,12 @@ from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from pygame.sprite import Group
-def check_events(ship,bullets,game_settings,screen):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:
-                ship.moving_right=True
-            elif event.key==pygame.K_LEFT:
-                ship.moving_left=True
-            elif event.key==pygame.K_SPACE:
-                if len(bullets)<game_settings.bullet_max:
-                    new_bullet=Bullet(game_settings,screen,ship)
-                    bullets.add(new_bullet)
-                    if pygame.mixer:
-                        game_settings.bullet_fire_sound.play()
-
-        if event.type==pygame.KEYUP:
-            if event.key == pygame.K_RIGHT:
-                ship.moving_right=False
-            elif event.key==pygame.K_LEFT:
-                ship.moving_left=False
-
-def update_bullets(bullets):
-    bullets.update()
-    for bullet in bullets.copy():
-        if bullet.rect.bottom <= 0:
-            bullets.remove(bullet)
-    for bullet in bullets.sprites():
-        bullet.draw_bullet()
-
-def update_screen(game_settings, screen, ship,bullets):
-    screen.blit(game_settings.backgroud, (0, 0))
-    ship.update()
-    ship.blitme()
-    update_bullets(bullets)
-
-
-    pygame.display.flip()
+from alien import Alien
+from explosion import Explosion
+from game_stats import Gamestats
+from button import Button
+from scoreboard import Scoreboard
+from game_functions import *
 
 
 def run_game():
@@ -49,15 +17,24 @@ def run_game():
     game_settings = Settings()
     screen = pygame.display.set_mode((game_settings.screen_width, game_settings.screen_height))
     pygame.display.set_caption("game")
+    stats = Gamestats(game_settings)
+    scoreboard = Scoreboard(game_settings, screen, stats)
     screen.blit(game_settings.backgroud, (0, 0))
-    ship = Ship(screen,game_settings)
-    bullets=Group()
-
+    play_button = Button(game_settings, screen, "Play")
+    ship = Ship(screen, game_settings)
+    bullets = Group()
+    aliens = Group()
+    explosions = Group()
+    create_fleet(game_settings, screen, aliens, ship)
 
     while True:
-        check_events(ship,bullets,game_settings,screen)
-        update_screen(game_settings, screen, ship,bullets)
-
+        check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard)
+        if stats.game_active:
+            ship.update()
+            update_bullets(bullets, aliens, game_settings, screen, ship, explosions, stats, scoreboard)
+            update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboard)
+        # print(len(aliens),aliens.sprites()[0].rect.y,aliens.sprites()[0].rect.x,aliens.sprites()[0].speed)
+        update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard)
 
 
 if __name__ == '__main__':
