@@ -36,6 +36,7 @@ class Ship(Sprite):
         self.rect.centerx = self.screen_rect.centerx
         self.centerx = float(self.rect.centerx)
         self.rect.bottom = self.screen_rect.bottom
+        self.bottom=self.screen_rect.bottom
         self.moving_right = False
         self.moving_left = False
         self.moving_up = False

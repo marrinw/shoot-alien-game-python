@@ -1,4 +1,5 @@
 import pygame.font
+import time
 
 
 class Scoreboard():
@@ -9,11 +10,13 @@ class Scoreboard():
         self.stats = stats
         self.text_color = (255, 255, 255)
         self.font = pygame.font.SysFont(None, 48)
+        self.bullet_font = pygame.font.SysFont(None, 24)
         self.bg_color = (0, 0, 0)
         self.prep_high_score()
         self.prep_score()
         self.prep_level()
         self.prep_ships()
+        self.prep_bullets()
 
     def prep_score(self):
         score_str = "score is " + str(self.stats.score)
@@ -43,8 +46,19 @@ class Scoreboard():
         self.ships_rect.left = 10
         self.ships_rect.top = self.screen_rect.top
 
+    def prep_bullets(self):
+        ships_str = "wide " + str(self.game_settings.wide_bullet_remain) + " strong " + str(
+            self.game_settings.strong_bullet_remain) + " unlimited time " + str(
+            max(0, int(self.game_settings.bullet_unlimit_time - time.time())))
+        self.bullets_image = self.bullet_font.render(ships_str, True, self.text_color, self.bg_color)
+        self.bullets_rect = self.bullets_image.get_rect()
+        self.bullets_rect.left = 10
+        self.bullets_rect.bottom = self.screen_rect.bottom
+
     def show_score(self):
+        self.prep_bullets()
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)
         self.screen.blit(self.ships_image, self.ships_rect)
+        self.screen.blit(self.bullets_image, self.bullets_rect)
