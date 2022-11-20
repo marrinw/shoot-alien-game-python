@@ -1,5 +1,7 @@
 import pygame
 from pygame.sprite import Sprite
+import random
+import time
 
 
 class Alien(Sprite):
@@ -35,6 +37,57 @@ class Alien(Sprite):
     def update(self):
         self.x += self.speed * self.game_settings.fleet_direction
         self.rect.x = self.x
+
+    def blitme(self):
+        self.screen.blit(self.image, self.rect)
+
+
+class Alien_ship(Sprite):
+    def __init__(self, game_settings, screen):
+        super(Alien_ship, self).__init__()
+        self.screen = screen
+        self.game_settings = game_settings
+        self.life = game_settings.alien_ship_life
+        self.speed = self.game_settings.alien_ship_speed
+        self.image = pygame.image.load("./data/image/alien_ship.png")
+        self.image = pygame.transform.scale(self.image, (100, 120))
+        self.rect = self.image.get_rect()
+        self.screen_rect = screen.get_rect()
+        self.rect.centerx = self.screen_rect.centerx
+        self.rect.top = self.screen_rect.top
+        self.centerx = float(self.rect.centerx)
+        self.moving_direction = random.randint(-1, 1)
+        self.changing_direction_time = game_settings.alien_ship_changing_direction_time
+        self.last_changing_direction_time = time.time()
+
+    def update(self):
+        if time.time() - self.last_changing_direction_time >= self.changing_direction_time:
+            self.moving_direction = random.randint(-1, 1)
+            self.last_changing_direction_time = time.time()
+        self.centerx += self.moving_direction * self.speed
+        self.rect.centerx = self.centerx
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > self.screen_rect.right:
+            self.rect.right = self.screen_rect.right
+        self.centerx = float(self.rect.centerx)
+
+    def blitme(self):
+        self.screen.blit(self.image, self.rect)
+
+
+class Boss_alien(Sprite):
+    def __init__(self, game_settings, screen):
+        super(Boss_alien, self).__init__()
+        self.screen = screen
+        self.game_settings = game_settings
+        self.life = game_settings.boss_alien_life
+        self.image = pygame.image.load("./data/image/boss_alien.jpg")
+        self.image = pygame.transform.scale(self.image, (400, 360))
+        self.rect = self.image.get_rect()
+        self.screen_rect = screen.get_rect()
+        self.rect.centerx = self.screen_rect.centerx
+        self.rect.top = self.screen_rect.top
 
     def blitme(self):
         self.screen.blit(self.image, self.rect)

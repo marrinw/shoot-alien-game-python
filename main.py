@@ -5,7 +5,7 @@ from ship import Ship
 from bullet import Bullet
 from bullet import Alien_bullet
 from pygame.sprite import Group
-from alien import Alien
+from alien import *
 from explosion import Explosion
 from game_stats import Gamestats
 from button import Button
@@ -26,19 +26,24 @@ def run_game():
     ship = Ship(screen, game_settings)
     bullets = Group()
     aliens = Group()
+    alien_ships = Group()
     explosions = Group()
     alien_bullets = Group()
-    create_fleet(game_settings, screen, aliens, ship)
+    boss_aliens = Group()
+    # create_fleet(game_settings, screen, aliens, ship)
 
     while True:
-        check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets)
+        check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
+                     alien_ships, boss_aliens)
         if stats.game_active:
             ship.update()
-            update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboard, alien_bullets)
-            update_bullets(bullets, aliens, game_settings, screen, ship, explosions, stats, scoreboard, alien_bullets)
-        # print(len(aliens),aliens.sprites()[0].rect.y,aliens.sprites()[0].rect.x,aliens.sprites()[0].speed)
+            update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboard, alien_bullets, alien_ships,
+                          boss_aliens)
+            update_bullets(bullets, aliens, game_settings, screen, ship, explosions, stats, scoreboard, alien_bullets,
+                           alien_ships, boss_aliens)
+
         update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard,
-                      alien_bullets)
+                      alien_bullets, alien_ships, boss_aliens)
 
 
 if __name__ == '__main__':

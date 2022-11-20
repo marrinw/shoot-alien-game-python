@@ -9,8 +9,9 @@ class Settings():
         self.backgroud = pygame.image.load("./data/image/background.JPG")
         self.backgroud = pygame.transform.scale(self.backgroud, (self.screen_width, self.screen_height))
         self.ship_moving_speed = 1.5
+        self.ship_life = 3
         self.bullet_speed = 3
-        self.bullet_width = 3
+        self.bullet_width = 300
         self.bullet_height = 15
         self.bullet_color = "yellow"
         self.strong_bullet_color = "red"
@@ -19,12 +20,16 @@ class Settings():
         self.wide_bullet_width = 300
         self.wide_bullet_remain = 0
         self.strong_bullet_remain = 0
-        self.alien_reward = [0, 0, {"wide_bullet_num": 2}, {"strong_bullet_num": 2}, {"unlimited_bullet_time": 3}]
+        self.alien_reward = [0, 0, {"wide_bullet_num": 1}, {"strong_bullet_num": 2}, {"unlimited_bullet_time": 3}]
+        self.alien_ship_reward = {"wide_bullet_num": 1, "strong_bullet_num": 1, "ship_life_max": True}
+        self.boss_alien_reward = {"wide_bullet_num": 1, "strong_bullet_num": 1, "ship_life_max": True,
+                                  "ship_life_increase": 2}
         self.alien_bullet_speed = 0.3
         self.alien_bullet_width = 3
         self.alien_bullet_height = 15
         self.alien_bullet_color = "green"
-        self.alien_fire_bullet_random = 200
+        self.alien_fire_bullet_random = 250
+        self.alien_ships_fire_bullet_random = 400
         if (pygame.mixer):
             self.bullet_fire_sound = pygame.mixer.Sound("./data/sound/bullet_fire.wav")
             self.boom_sound = pygame.mixer.Sound("./data/sound/boom.wav")
@@ -38,6 +43,16 @@ class Settings():
         self.points_scale = 1.5
         self.alien_types = 4
         self.alien_type_rate = 30
+        self.alien_ship_life = 3
+        self.alien_ship_speed = 0.2
+        self.alien_ship_max = 2
+        self.alien_ship_changing_direction_time = 1
+        self.alien_ship_points = 100
+        self.boss_alien_life = 10
+        self.is_boss_alien = False
+        self.boss_alien_appearance_round = 2
+        self.boss_alien_points = 500
+
         self.initialize_dynamic_settings()
 
     def increase_speed(self):
@@ -45,8 +60,20 @@ class Settings():
         self.bullet_speed *= self.speedup_scale
         self.alien_speed *= self.speedup_scale
         self.alien_points = int(self.alien_points * self.points_scale)
+        self.alien_ship_life += 1
+        self.alien_ship_speed *= self.speedup_scale
+        self.alien_ship_points = int(self.alien_ship_points * self.speedup_scale)
+        self.boss_alien_life += 2
+        self.boss_alien_points = int(self.boss_alien_points * self.speedup_scale)
 
     def initialize_dynamic_settings(self):
         self.alien_speed = 1
+        self.alien_ship_speed = 0.2
         self.bullet_speed = 3
         self.ship_moving_speed = 1.5
+        self.boss_alien_points = 500
+        self.alien_points = 50
+        self.alien_ship_points = 100
+        self.boss_alien_life = 10
+        self.alien_ship_life = 3
+        self.ship_life = 3

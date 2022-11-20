@@ -19,6 +19,12 @@ class Ship(Sprite):
         self.moving_up = False
         self.moving_down = False
         self.bottom = float(self.screen_rect.bottom)
+        self.life_max = game_settings.ship_life
+        self.life = self.life_max
+        self.text_color = (255, 255, 255)
+        self.font = pygame.font.SysFont(None, 24)
+        self.bg_color = (0, 0, 0)
+        self.prep_life()
 
     def update(self):
         if self.moving_right == True and self.rect.right < self.screen_rect.right:
@@ -36,7 +42,7 @@ class Ship(Sprite):
         self.rect.centerx = self.screen_rect.centerx
         self.centerx = float(self.rect.centerx)
         self.rect.bottom = self.screen_rect.bottom
-        self.bottom=self.screen_rect.bottom
+        self.bottom = self.screen_rect.bottom
         self.moving_right = False
         self.moving_left = False
         self.moving_up = False
@@ -44,3 +50,16 @@ class Ship(Sprite):
 
     def blitme(self):
         self.screen.blit(self.image, self.rect)
+        self.screen.blit(self.life_image, self.life_rect)
+
+    def reset(self):
+        self.center_ship()
+        self.life = self.life_max
+        self.prep_life()
+
+    def prep_life(self):
+        high_score_str = "ship life remains " + str(self.life)
+        self.life_image = self.font.render(high_score_str, True, self.text_color, self.bg_color)
+        self.life_rect = self.life_image.get_rect()
+        self.life_rect.right = self.screen_rect.right
+        self.life_rect.bottom = self.screen_rect.bottom
