@@ -11,7 +11,7 @@ class Settings():
         self.ship_moving_speed = 1.5
         self.ship_life = 3
         self.bullet_speed = 3
-        self.bullet_width = 300
+        self.bullet_width = 3
         self.bullet_height = 15
         self.bullet_color = "yellow"
         self.strong_bullet_color = "red"
@@ -52,6 +52,11 @@ class Settings():
         self.is_boss_alien = False
         self.boss_alien_appearance_round = 2
         self.boss_alien_points = 500
+        self.boss_bullet_max = 30
+        self.boss_bullet_min = 10
+        self.boss_bullet_speed = 1
+        self.boss_bullet_grow_time = 0.5
+        self.boss_bullet_grow_rate_max = 1.4
 
         self.initialize_dynamic_settings()
 
@@ -65,6 +70,8 @@ class Settings():
         self.alien_ship_points = int(self.alien_ship_points * self.speedup_scale)
         self.boss_alien_life += 2
         self.boss_alien_points = int(self.boss_alien_points * self.speedup_scale)
+        self.boss_bullet_max += 10
+        self.boss_bullet_min += 5
 
     def initialize_dynamic_settings(self):
         self.alien_speed = 1
@@ -77,3 +84,5 @@ class Settings():
         self.boss_alien_life = 10
         self.alien_ship_life = 3
         self.ship_life = 3
+        self.boss_bullet_max = 30
+        self.boss_bullet_min = 10

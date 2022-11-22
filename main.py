@@ -2,8 +2,7 @@ import sys
 import pygame
 from settings import Settings
 from ship import Ship
-from bullet import Bullet
-from bullet import Alien_bullet
+from bullet import *
 from pygame.sprite import Group
 from alien import *
 from explosion import Explosion
@@ -30,20 +29,21 @@ def run_game():
     explosions = Group()
     alien_bullets = Group()
     boss_aliens = Group()
+    boss_bullets = Group()
     # create_fleet(game_settings, screen, aliens, ship)
 
     while True:
         check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
-                     alien_ships, boss_aliens)
+                     alien_ships, boss_aliens, boss_bullets)
         if stats.game_active:
             ship.update()
             update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboard, alien_bullets, alien_ships,
-                          boss_aliens)
+                          boss_aliens, boss_bullets)
             update_bullets(bullets, aliens, game_settings, screen, ship, explosions, stats, scoreboard, alien_bullets,
-                           alien_ships, boss_aliens)
+                           alien_ships, boss_aliens, boss_bullets)
 
         update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard,
-                      alien_bullets, alien_ships, boss_aliens)
+                      alien_bullets, alien_ships, boss_aliens, boss_bullets)
 
 
 if __name__ == '__main__':

@@ -2,8 +2,7 @@ import pygame
 import sys
 from settings import Settings
 from ship import Ship
-from bullet import Bullet
-from bullet import Alien_bullet
+from bullet import *
 from pygame.sprite import Group
 from alien import *
 from explosion import Explosion
@@ -14,7 +13,8 @@ import random
 import time
 
 
-def ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, alien_bullets, alien_ships, boss_aliens):
+def ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, alien_bullets, alien_ships, boss_aliens,
+             boss_bullets):
     game_settings.wide_bullet_remain = 0
     game_settings.strong_bullet_remain = 0
     stats.ships_left -= 1
@@ -27,6 +27,7 @@ def ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, al
         bullets.empty()
         alien_ships.empty()
         boss_aliens.empty()
+        boss_bullets.empty()
         create_fleet(game_settings, screen, aliens, ship, alien_ships)
         game_settings.is_boss_alien = False
         ship.reset()
@@ -98,7 +99,7 @@ def change_fleet_direction(game_settings, aliens):
 
 
 def check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_button, mouse_x, mouse_y, scoreboard,
-                      alien_bullets, alien_ships, boss_aliens):
+                      alien_bullets, alien_ships, boss_aliens, boss_bullets):
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:
         game_settings.initialize_dynamic_settings()
@@ -115,6 +116,7 @@ def check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_
         alien_bullets.empty()
         alien_ships.empty()
         boss_aliens.empty()
+        boss_bullets.empty()
         ship.reset()
         create_fleet(game_settings, screen, aliens, ship, alien_ships)
 
@@ -138,14 +140,14 @@ def ship_fire_bullet(ship, bullets, game_settings, screen, scoreboard):
 
 
 def check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
-                 alien_ships, boss_aliens):
+                 alien_ships, boss_aliens, boss_bullets):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_button, mouse_x, mouse_y,
-                              scoreboard, alien_bullets, alien_ships, boss_aliens)
+                              scoreboard, alien_bullets, alien_ships, boss_aliens, boss_bullets)
         elif True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
@@ -171,7 +173,7 @@ def check_events(ship, bullets, game_settings, screen, aliens, stats, play_butto
 
 
 def update_bullets(bullets, aliens, game_settings, screen, ship, explosions, stats, scoreboard, alien_bullets,
-                   alien_ships, boss_aliens):
+                   alien_ships, boss_aliens, boss_bullets):
     bullets.update()
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
@@ -181,33 +183,49 @@ def update_bullets(bullets, aliens, game_settings, screen, ship, explosions, sta
     for alien_bullet in alien_bullets.copy():
         if alien_bullet.rect.bottom >= screen.get_rect().bottom:
             alien_bullets.remove(alien_bullet)
+
+    boss_bullets.update()
+    for boss_bullet in boss_bullets.copy():
+        if boss_bullet.rect.bottom <= 0:
+            boss_bullets.remove(boss_bullet)
+        elif boss_bullet.rect.top >= screen.get_rect().bottom:
+            boss_bullets.remove(boss_bullet)
+        elif boss_bullet.rect.right <= 0:
+            boss_bullets.remove(boss_bullet)
+        elif boss_bullet.rect.left >= screen.get_rect().right:
+            boss_bullets.remove(boss_bullet)
     check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, explosions, stats, scoreboard,
-                                 alien_ships, boss_aliens)
-    check_mutual_bullet_collision(bullets, alien_bullets)
+                                 alien_ships, boss_aliens, alien_bullets, boss_bullets)
+    check_mutual_bullet_collision(bullets, alien_bullets, boss_bullets)
     for explosion in explosions.sprites():
         explosion.update()
     check_ship_alien_bullet_collision(bullets, aliens, game_settings, screen, ship, stats, scoreboard, alien_bullets,
-                                      alien_ships, boss_aliens)
+                                      alien_ships, boss_aliens, boss_bullets)
 
 
 def check_ship_alien_bullet_collision(bullets, aliens, game_settings, screen, ship, stats, scoreboard, alien_bullets,
-                                      alien_ships, boss_aliens):
+                                      alien_ships, boss_aliens, boss_bullets):
     hitted_alien_bullets = pygame.sprite.spritecollide(ship, alien_bullets, True)
-    if (hitted_alien_bullets):
+    hitted_boss_bullets = pygame.sprite.spritecollide(ship, boss_bullets, True)
+    if (hitted_alien_bullets or hitted_boss_bullets):
         for hitted_alien_bullet in hitted_alien_bullets:
+            ship.life -= 1
+            ship.prep_life()
+        for hitted_boss_bullet in hitted_boss_bullets:
             ship.life -= 1
             ship.prep_life()
         if ship.life <= 0:
             ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, alien_bullets, alien_ships,
-                     boss_aliens)
+                     boss_aliens, boss_bullets)
 
 
-def check_mutual_bullet_collision(bullets, alien_bullets):
-    collisions = pygame.sprite.groupcollide(bullets, alien_bullets, False, True)
+def check_mutual_bullet_collision(bullets, alien_bullets, boss_bullets):
+    collisions1 = pygame.sprite.groupcollide(bullets, alien_bullets, False, True)
+    collisions2 = pygame.sprite.groupcollide(bullets, boss_bullets, False, True)
 
 
 def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, explosions, stats, scoreboard,
-                                 alien_ships, boss_aliens):
+                                 alien_ships, boss_aliens, alien_bullets, boss_bullets):
     collisions = pygame.sprite.groupcollide(bullets, aliens, False, True)
     if collisions:
         for bullet in collisions:
@@ -280,7 +298,10 @@ def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, e
             stats.level += 1
             scoreboard.prep_level()
             game_settings.increase_speed()
+            alien_bullets.empty()
+            boss_bullets.empty()
             ship.center_ship()
+
             create_fleet(game_settings, screen, aliens, ship, alien_ships)
 
 
@@ -304,39 +325,54 @@ def aliens_fire(aliens, game_settings, screen, alien_bullets):
                 game_settings.alien_bullet_fire_sound.play()
 
 
+def boss_fire(boss_aliens, game_settings, screen, boss_bullets):
+    if len(boss_bullets) <= game_settings.boss_bullet_min and len(boss_aliens):
+        boss_bullets_num = random.randint(1, game_settings.boss_bullet_max)
+        for i in range(0, boss_bullets_num):
+            boss_bullet_grow_rate = random.uniform(1, game_settings.boss_bullet_grow_rate_max)
+            boss_bullet_direction = random.uniform(0, 3.14)
+            new_boss_bullet = Boss_bullet(game_settings, screen, boss_aliens.sprites()[0].rect.centerx,
+                                          boss_aliens.sprites()[0].rect.centery, boss_bullet_direction,
+                                          boss_bullet_grow_rate)
+            boss_bullets.add(new_boss_bullet)
+            if pygame.mixer:
+                game_settings.alien_bullet_fire_sound.play()
+
+
 def update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboard, alien_bullets, alien_ships,
-                  boss_aliens):
+                  boss_aliens, boss_bullets):
     check_fleet_edges(game_settings, aliens)
     aliens.update()
     if (pygame.sprite.spritecollideany(ship, aliens)):
         ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, alien_bullets, alien_ships,
-                 boss_aliens)
+                 boss_aliens, boss_bullets)
     if (pygame.sprite.spritecollideany(ship, alien_ships)):
         ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, alien_bullets, alien_ships,
-                 boss_aliens)
+                 boss_aliens, boss_bullets)
     if (pygame.sprite.spritecollideany(ship, boss_aliens)):
         ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, alien_bullets, alien_ships,
-                 boss_aliens)
+                 boss_aliens, boss_bullets)
     check_aliens_bottom(aliens, game_settings, ship, stats, screen, bullets, scoreboard, alien_bullets, alien_ships,
-                        boss_aliens)
+                        boss_aliens, boss_bullets)
     aliens_fire(aliens, game_settings, screen, alien_bullets)
     alien_ships_fire(alien_ships, game_settings, screen, alien_bullets)
+    boss_fire(boss_aliens, game_settings, screen, boss_bullets)
 
     alien_ships.update()
 
 
 def check_aliens_bottom(aliens, game_settings, ship, stats, screen, bullets, scoreboard, alien_bullets, alien_ships,
-                        boss_aliens):
+                        boss_aliens, boss_bullets):
     screen_rect = screen.get_rect()
     for alien in aliens:
         if alien.rect.bottom >= screen_rect.bottom:
             ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, alien_bullets, alien_ships,
-                     boss_aliens)
+                     boss_aliens, boss_bullets)
             break
 
 
 def update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard,
-                  alien_bullets, alien_ships, boss_aliens):
+                  alien_bullets, alien_ships, boss_aliens, boss_bullets):
     screen.blit(game_settings.backgroud, (0, 0))
     ship.blitme()
     explosions.draw(screen)
@@ -344,6 +380,8 @@ def update_screen(game_settings, screen, ship, bullets, aliens, explosions, stat
         bullet.draw_bullet()
     for alien_bullet in alien_bullets.sprites():
         alien_bullet.draw_bullet()
+    for boss_bullet in boss_bullets.sprites():
+        boss_bullet.draw_bullet()
     aliens.draw(screen)
     alien_ships.draw(screen)
     boss_aliens.draw(screen)
