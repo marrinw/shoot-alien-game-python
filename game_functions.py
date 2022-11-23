@@ -271,7 +271,6 @@ def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, e
             bullet.kill()
             for boss_alien in collisions3[bullet]:
                 boss_alien.life -= 1
-                print(boss_alien.life)
         for boss_alien in boss_aliens.sprites():
             if boss_alien.life <= 0:
                 stats.score += game_settings.boss_alien_points
@@ -327,16 +326,33 @@ def aliens_fire(aliens, game_settings, screen, alien_bullets):
 
 def boss_fire(boss_aliens, game_settings, screen, boss_bullets):
     if len(boss_bullets) <= game_settings.boss_bullet_min and len(boss_aliens):
-        boss_bullets_num = random.randint(1, game_settings.boss_bullet_max)
-        for i in range(0, boss_bullets_num):
-            boss_bullet_grow_rate = random.uniform(1, game_settings.boss_bullet_grow_rate_max)
-            boss_bullet_direction = random.uniform(0, 3.14)
-            new_boss_bullet = Boss_bullet(game_settings, screen, boss_aliens.sprites()[0].rect.centerx,
-                                          boss_aliens.sprites()[0].rect.centery, boss_bullet_direction,
-                                          boss_bullet_grow_rate)
-            boss_bullets.add(new_boss_bullet)
-            if pygame.mixer:
-                game_settings.alien_bullet_fire_sound.play()
+        attack_type = random.randint(0, 2)
+        if attack_type == 1:
+            boss_bullets_num = random.randint(1, game_settings.boss_bullet_max - len(boss_bullets))
+            for i in range(0, boss_bullets_num):
+                boss_bullet_grow_rate = random.uniform(1, game_settings.boss_bullet_grow_rate_max)
+                boss_bullet_direction = random.uniform(0, 3.14)
+                new_boss_bullet = Boss_bullet(game_settings, screen, boss_aliens.sprites()[0].rect.centerx,
+                                              boss_aliens.sprites()[0].rect.centery, boss_bullet_direction,
+                                              boss_bullet_grow_rate)
+                boss_bullets.add(new_boss_bullet)
+                if pygame.mixer:
+                    game_settings.alien_bullet_fire_sound.play()
+
+        elif attack_type == 2:
+            boss_bullets_num = random.randint(1, game_settings.boss_bullet_max - len(boss_bullets))
+            for i in range(0, boss_bullets_num // 3):
+                y = random.randint(0, screen.get_rect().bottom)
+                new_boss_bullet = Boss_bullet(game_settings, screen, 0, y, 0, 1)
+                boss_bullets.add(new_boss_bullet)
+            for i in range(0, boss_bullets_num // 3):
+                y = random.randint(0, screen.get_rect().bottom)
+                new_boss_bullet = Boss_bullet(game_settings, screen, screen.get_rect().right, y, 3.14, 1)
+                boss_bullets.add(new_boss_bullet)
+            for i in range(0, boss_bullets_num // 3):
+                x = random.randint(0, screen.get_rect().right)
+                new_boss_bullet = Boss_bullet(game_settings, screen, x, 0, 1.57, 1)
+                boss_bullets.add(new_boss_bullet)
 
 
 def update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboard, alien_bullets, alien_ships,

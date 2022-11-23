@@ -54,26 +54,25 @@ class Boss_bullet(Sprite):
     def __init__(self, game_settings, screen, x, y, direction, grow_rate):
         super(Boss_bullet, self).__init__()
         self.screen = screen
-        self.rect = pygame.Rect(0, 0, game_settings.alien_bullet_width, game_settings.alien_bullet_height)
+        self.rect = pygame.Rect(0, 0, game_settings.boss_bullet_size, game_settings.boss_bullet_size)
         self.rect.centerx = x
         self.rect.centery = y
         self.y = float(self.rect.y)
         self.x = float(self.rect.x)
-        self.width = float(game_settings.alien_bullet_width)
-        self.height = float(game_settings.alien_bullet_height)
+        self.size = float(game_settings.boss_bullet_size)
         self.color = game_settings.alien_bullet_color
         self.speed = game_settings.boss_bullet_speed = 1
         self.direction = direction
         self.grow_time = game_settings.boss_bullet_grow_time
         self.grow_rate = grow_rate
+        self.size_max = game_settings.boss_bullet_size_max
         self.last_grow_time = time.time()
 
     def update(self):
-        if time.time() - self.last_grow_time >= self.grow_time:
-            self.width *= self.grow_rate
-            self.height *= self.grow_rate
-            self.rect.width = self.width
-            self.rect.height = self.height
+        if time.time() - self.last_grow_time >= self.grow_time and self.size < self.size_max:
+            self.size *= self.grow_rate
+            self.rect.width = self.size
+            self.rect.height = self.size
             self.last_grow_time = time.time()
         self.y += self.speed * math.sin(self.direction)
         self.x += self.speed * math.cos(self.direction)

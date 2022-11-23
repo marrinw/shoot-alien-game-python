@@ -28,8 +28,8 @@ class Settings():
         self.alien_bullet_width = 3
         self.alien_bullet_height = 15
         self.alien_bullet_color = "green"
-        self.alien_fire_bullet_random = 250
-        self.alien_ships_fire_bullet_random = 400
+        self.alien_fire_bullet_random = 400
+        self.alien_ships_fire_bullet_random = 600
         if (pygame.mixer):
             self.bullet_fire_sound = pygame.mixer.Sound("./data/sound/bullet_fire.wav")
             self.boom_sound = pygame.mixer.Sound("./data/sound/boom.wav")
@@ -38,7 +38,7 @@ class Settings():
         self.fleet_drop_speed = 15
         self.fleet_direction = 1  # 1右
         self.ships_limit = 3
-        self.speedup_scale = 1.1
+        self.speedup_scale = 1.02
         self.alien_points = 50
         self.points_scale = 1.5
         self.alien_types = 4
@@ -52,11 +52,13 @@ class Settings():
         self.is_boss_alien = False
         self.boss_alien_appearance_round = 2
         self.boss_alien_points = 500
-        self.boss_bullet_max = 30
+        self.boss_bullet_max = 20
         self.boss_bullet_min = 10
         self.boss_bullet_speed = 1
         self.boss_bullet_grow_time = 0.5
-        self.boss_bullet_grow_rate_max = 1.4
+        self.boss_bullet_grow_rate_max = 1.2
+        self.boss_bullet_size = 10
+        self.boss_bullet_size_max = 30
 
         self.initialize_dynamic_settings()
 
