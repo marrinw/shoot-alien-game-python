@@ -5,6 +5,10 @@ import time
 
 
 class Bullet(Sprite):
+    """
+        玩家子弹
+    """
+
     def __init__(self, game_settings, screen, ship, is_wide_bullet=False, is_strong_bullet=False):
         super(Bullet, self).__init__()
         self.screen = screen
@@ -24,14 +28,24 @@ class Bullet(Sprite):
         self.speed = game_settings.bullet_speed
 
     def update(self):
+        """
+            更新
+        """
         self.y -= self.speed
         self.rect.y = self.y
 
     def draw_bullet(self):
+        """
+            画图
+        """
         pygame.draw.rect(self.screen, self.color, self.rect)
 
 
 class Alien_bullet(Sprite):
+    """
+        外星人子弹
+    """
+
     def __init__(self, game_settings, screen, alien):
         super(Alien_bullet, self).__init__()
         self.screen = screen
@@ -43,14 +57,24 @@ class Alien_bullet(Sprite):
         self.speed = game_settings.alien_bullet_speed
 
     def update(self):
+        """
+            更新
+        """
         self.y += self.speed
         self.rect.y = self.y
 
     def draw_bullet(self):
+        """
+            画图
+        """
         pygame.draw.rect(self.screen, self.color, self.rect)
 
 
 class Boss_bullet(Sprite):
+    """
+        外星boss子弹
+    """
+
     def __init__(self, game_settings, screen, x, y, direction, grow_rate):
         super(Boss_bullet, self).__init__()
         self.screen = screen
@@ -69,7 +93,11 @@ class Boss_bullet(Sprite):
         self.last_grow_time = time.time()
 
     def update(self):
+        """
+            更新
+        """
         if time.time() - self.last_grow_time >= self.grow_time and self.size < self.size_max:
+            # 变大
             self.size *= self.grow_rate
             self.rect.width = self.size
             self.rect.height = self.size
@@ -80,4 +108,7 @@ class Boss_bullet(Sprite):
         self.rect.x = self.x
 
     def draw_bullet(self):
+        """
+            画图
+        """
         pygame.draw.rect(self.screen, self.color, self.rect)

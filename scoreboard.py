@@ -3,6 +3,10 @@ import time
 
 
 class Scoreboard():
+    """
+        计分板
+    """
+
     def __init__(self, game_settings, screen, stats):
         self.screen = screen
         self.screen_rect = screen.get_rect()
@@ -19,6 +23,9 @@ class Scoreboard():
         self.prep_bullets()
 
     def prep_score(self):
+        """
+            修改信息
+        """
         score_str = "score is " + str(self.stats.score)
         self.score_image = self.font.render(score_str, True, self.text_color, self.bg_color)
         self.score_rect = self.score_image.get_rect()
@@ -26,13 +33,19 @@ class Scoreboard():
         self.score_rect.top = 20
 
     def prep_high_score(self):
-        high_score_str = "highest score is " + str(self.stats.score)
+        """
+            修改信息
+        """
+        high_score_str = "highest score is " + str(self.stats.high_score)
         self.high_score_image = self.font.render(high_score_str, True, self.text_color, self.bg_color)
         self.high_score_rect = self.high_score_image.get_rect()
         self.high_score_rect.centerx = self.screen_rect.centerx
         self.high_score_rect.top = self.screen_rect.top
 
     def prep_level(self):
+        """
+            修改信息
+        """
         level_str = "level is " + str(self.stats.level)
         self.level_image = self.font.render(level_str, True, self.text_color, self.bg_color)
         self.level_rect = self.score_image.get_rect()
@@ -40,6 +53,9 @@ class Scoreboard():
         self.level_rect.top = self.score_rect.bottom + 10
 
     def prep_ships(self):
+        """
+            修改信息
+        """
         ships_str = "ships left " + str(self.stats.ships_left)
         self.ships_image = self.font.render(ships_str, True, self.text_color, self.bg_color)
         self.ships_rect = self.ships_image.get_rect()
@@ -47,6 +63,9 @@ class Scoreboard():
         self.ships_rect.top = self.screen_rect.top
 
     def prep_bullets(self):
+        """
+            修改信息
+        """
         ships_str = "wide " + str(self.game_settings.wide_bullet_remain) + " strong " + str(
             self.game_settings.strong_bullet_remain) + " unlimited time " + str(
             max(0, int(self.game_settings.bullet_unlimit_time - time.time())))
@@ -56,6 +75,9 @@ class Scoreboard():
         self.bullets_rect.bottom = self.screen_rect.bottom
 
     def show_score(self):
+        """
+            画图，展示信息
+        """
         self.prep_bullets()
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)

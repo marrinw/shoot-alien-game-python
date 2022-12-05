@@ -3,6 +3,10 @@ from pygame.sprite import Sprite
 
 
 class Ship(Sprite):
+    """
+        玩家飞机
+    """
+
     def __init__(self, screen, game_settings):
         super(Ship, self).__init__()
         self.screen = screen
@@ -27,6 +31,9 @@ class Ship(Sprite):
         self.prep_life()
 
     def update(self):
+        """
+            更新
+        """
         if self.moving_right == True and self.rect.right < self.screen_rect.right:
             self.centerx += self.moving_speed
         if self.moving_left == True and self.rect.left > 0:
@@ -39,6 +46,9 @@ class Ship(Sprite):
         self.rect.bottom = self.bottom
 
     def center_ship(self):
+        """
+            飞机回到最下面中央
+        """
         self.rect.centerx = self.screen_rect.centerx
         self.centerx = float(self.rect.centerx)
         self.rect.bottom = self.screen_rect.bottom
@@ -49,15 +59,24 @@ class Ship(Sprite):
         self.moving_down = False
 
     def blitme(self):
+        """
+            画图
+        """
         self.screen.blit(self.image, self.rect)
         self.screen.blit(self.life_image, self.life_rect)
 
     def reset(self):
+        """
+            重置
+        """
         self.center_ship()
         self.life = self.life_max
         self.prep_life()
 
     def prep_life(self):
+        """
+            显示生命值
+        """
         high_score_str = "ship life remains " + str(self.life)
         self.life_image = self.font.render(high_score_str, True, self.text_color, self.bg_color)
         self.life_rect = self.life_image.get_rect()

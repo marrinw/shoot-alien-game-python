@@ -3,13 +3,18 @@ import time
 
 
 class Settings():
+    """
+        游戏设置
+    """
+
     def __init__(self):
         self.screen_height = 800
         self.screen_width = 1600
-        self.backgroud = pygame.image.load("./data/image/background.JPG")
+        self.backgroud = pygame.image.load("./data/image/background.gif")
         self.backgroud = pygame.transform.scale(self.backgroud, (self.screen_width, self.screen_height))
         self.ship_moving_speed = 1.5
-        self.ship_life = 3
+        self.ships_limit = 3        #一共有多少玩家飞船
+        self.ship_life = 5          #每个玩家飞船的生命
         self.bullet_speed = 3
         self.bullet_width = 3
         self.bullet_height = 15
@@ -21,7 +26,7 @@ class Settings():
         self.wide_bullet_remain = 0
         self.strong_bullet_remain = 0
         self.alien_reward = [0, 0, {"wide_bullet_num": 1}, {"strong_bullet_num": 2}, {"unlimited_bullet_time": 3}]
-        self.alien_ship_reward = {"wide_bullet_num": 1, "strong_bullet_num": 1, "ship_life_max": True}
+        self.alien_ship_reward = {"wide_bullet_num": 0, "strong_bullet_num": 0, "ship_life_max": True}
         self.boss_alien_reward = {"wide_bullet_num": 1, "strong_bullet_num": 1, "ship_life_max": True,
                                   "ship_life_increase": 2}
         self.alien_bullet_speed = 0.3
@@ -37,7 +42,6 @@ class Settings():
         self.alien_speed = 1
         self.fleet_drop_speed = 15
         self.fleet_direction = 1  # 1右
-        self.ships_limit = 3
         self.speedup_scale = 1.02
         self.alien_points = 50
         self.points_scale = 1.5
@@ -59,7 +63,6 @@ class Settings():
         self.boss_bullet_grow_rate_max = 1.2
         self.boss_bullet_size = 10
         self.boss_bullet_size_max = 30
-
         self.initialize_dynamic_settings()
 
     def increase_speed(self):
@@ -85,6 +88,6 @@ class Settings():
         self.alien_ship_points = 100
         self.boss_alien_life = 10
         self.alien_ship_life = 3
-        self.ship_life = 3
+        self.ship_life = 5
         self.boss_bullet_max = 30
         self.boss_bullet_min = 10

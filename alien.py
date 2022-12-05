@@ -5,6 +5,10 @@ import time
 
 
 class Alien(Sprite):
+    """
+        普通外星人
+    """
+
     def __init__(self, game_settings, screen, type=0):
         super(Alien, self).__init__()
         self.screen = screen
@@ -27,6 +31,9 @@ class Alien(Sprite):
         self.x = float(self.rect.x)
 
     def check_edges(self):
+        """
+            判断是否碰到边缘
+        """
         screen_rect = self.screen.get_rect()
         if self.rect.right >= screen_rect.right:
             return True
@@ -35,14 +42,24 @@ class Alien(Sprite):
         return False
 
     def update(self):
+        """
+            更新
+        """
         self.x += self.speed * self.game_settings.fleet_direction
         self.rect.x = self.x
 
     def blitme(self):
+        """
+            画图
+        """
         self.screen.blit(self.image, self.rect)
 
 
 class Alien_ship(Sprite):
+    """
+        外星飞机
+    """
+
     def __init__(self, game_settings, screen):
         super(Alien_ship, self).__init__()
         self.screen = screen
@@ -61,6 +78,9 @@ class Alien_ship(Sprite):
         self.last_changing_direction_time = time.time()
 
     def update(self):
+        """
+            更新
+        """
         if time.time() - self.last_changing_direction_time >= self.changing_direction_time:
             self.moving_direction = random.randint(-1, 1)
             self.last_changing_direction_time = time.time()
@@ -73,10 +93,17 @@ class Alien_ship(Sprite):
         self.centerx = float(self.rect.centerx)
 
     def blitme(self):
+        """
+            画图
+        """
         self.screen.blit(self.image, self.rect)
 
 
 class Boss_alien(Sprite):
+    """
+        外星boss
+    """
+
     def __init__(self, game_settings, screen):
         super(Boss_alien, self).__init__()
         self.screen = screen
@@ -90,4 +117,7 @@ class Boss_alien(Sprite):
         self.rect.top = self.screen_rect.top
 
     def blitme(self):
+        """
+            画图
+        """
         self.screen.blit(self.image, self.rect)
