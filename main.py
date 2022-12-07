@@ -15,6 +15,7 @@ from game_functions import *
 
 
 def run_game():
+    # 初始化
     pygame.init()
     game_settings = Settings()
     screen = pygame.display.set_mode((game_settings.screen_width, game_settings.screen_height))
@@ -24,7 +25,7 @@ def run_game():
         pygame.display.set_icon(icon)
     stats = Gamestats(game_settings)
     scoreboard = Scoreboard(game_settings, screen, stats)
-    screen.blit(game_settings.backgroud, (0, 0))
+    screen.blit(game_settings.background, (0, 0))
     play_button = Button(game_settings, screen, "Play")
     ship = Ship(screen, game_settings)
     bullets = Group()
@@ -36,13 +37,13 @@ def run_game():
     boss_bullets = Group()
     # create_fleet(game_settings, screen, aliens, ship)
 
-    while True:
+    while True:  # 游戏开始，不断循环判断
         check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
-                     alien_ships, boss_aliens, boss_bullets,explosions)
-        if stats.game_active:
+                     alien_ships, boss_aliens, boss_bullets, explosions)
+        if stats.game_active:  # 游戏进行中
             ship.update()
             update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboard, alien_bullets, alien_ships,
-                          boss_aliens, boss_bullets,explosions)
+                          boss_aliens, boss_bullets, explosions)
             update_bullets(bullets, aliens, game_settings, screen, ship, explosions, stats, scoreboard, alien_bullets,
                            alien_ships, boss_aliens, boss_bullets)
 

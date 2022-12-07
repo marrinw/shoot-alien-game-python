@@ -10,26 +10,25 @@ class Settings():
     def __init__(self):
         self.screen_height = 800
         self.screen_width = 1600
-        self.backgroud = pygame.image.load("./data/image/background.gif")
-        self.backgroud = pygame.transform.scale(self.backgroud, (self.screen_width, self.screen_height))
+        self.background = pygame.image.load("./data/image/background.gif")
+        self.background = pygame.transform.scale(self.background, (self.screen_width, self.screen_height))
         self.ship_moving_speed = 1.5
-        self.ships_limit = 3        #一共有多少玩家飞船
-        self.ship_life = 5          #每个玩家飞船的生命
+        self.ships_limit = 3  # 一共有多少玩家飞船
+        self.ship_life = 5  # 每个玩家飞船的生命
         self.bullet_speed = 3
         self.bullet_width = 3
         self.bullet_height = 15
         self.bullet_color = "yellow"
         self.strong_bullet_color = "red"
-        self.bullet_unlimit_time = time.time()
+        self.bullet_unlimited_time = time.time()
         self.bullet_max = 3
         self.wide_bullet_width = 300
         self.wide_bullet_remain = 0
         self.strong_bullet_remain = 0
         self.alien_reward = [0, 0, {"wide_bullet_num": 1}, {"strong_bullet_num": 2}, {"unlimited_bullet_time": 3}]
-        self.alien_ship_reward = {"wide_bullet_num": 0, "strong_bullet_num": 0, "ship_life_max": True}
-        self.boss_alien_reward = {"wide_bullet_num": 1, "strong_bullet_num": 1, "ship_life_max": True,
-                                  "ship_life_increase": 2}
-        self.alien_bullet_speed = 0.3
+        self.alien_ship_reward = {"wide_bullet_num": 0, "strong_bullet_num": 0, "ship_life_increase": 2}
+        self.boss_alien_reward = {"wide_bullet_num": 1, "strong_bullet_num": 1, "ship_life_max": True}
+        self.alien_bullet_speed = 0.4
         self.alien_bullet_width = 3
         self.alien_bullet_height = 15
         self.alien_bullet_color = "green"
@@ -56,7 +55,7 @@ class Settings():
         self.is_boss_alien = False
         self.boss_alien_appearance_round = 2
         self.boss_alien_points = 500
-        self.boss_bullet_max = 20
+        self.boss_bullet_max = 30
         self.boss_bullet_min = 10
         self.boss_bullet_speed = 1
         self.boss_bullet_grow_time = 0.5
@@ -69,6 +68,7 @@ class Settings():
         self.ship_moving_speed *= self.speedup_scale
         self.bullet_speed *= self.speedup_scale
         self.alien_speed *= self.speedup_scale
+        self.alien_bullet_speed *= self.speedup_scale
         self.alien_points = int(self.alien_points * self.points_scale)
         self.alien_ship_life += 1
         self.alien_ship_speed *= self.speedup_scale
@@ -81,6 +81,7 @@ class Settings():
     def initialize_dynamic_settings(self):
         self.alien_speed = 1
         self.alien_ship_speed = 0.2
+        self.alien_bullet_speed = 0.4
         self.bullet_speed = 3
         self.ship_moving_speed = 1.5
         self.boss_alien_points = 500

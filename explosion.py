@@ -12,7 +12,7 @@ class Explosion(Sprite):
         super(Explosion, self).__init__()
         self.image = pygame.image.load("./data/image/explosion.gif")
         self.rect = self.image.get_rect(center=actor.rect.center)
-        self.life = 12
+        self.life = 10
 
     def update(self):
         """

@@ -68,7 +68,7 @@ class Scoreboard():
         """
         ships_str = "wide " + str(self.game_settings.wide_bullet_remain) + " strong " + str(
             self.game_settings.strong_bullet_remain) + " unlimited time " + str(
-            max(0, int(self.game_settings.bullet_unlimit_time - time.time())))
+            max(0, int(self.game_settings.bullet_unlimited_time - time.time())))
         self.bullets_image = self.bullet_font.render(ships_str, True, self.text_color, self.bg_color)
         self.bullets_rect = self.bullets_image.get_rect()
         self.bullets_rect.left = 10

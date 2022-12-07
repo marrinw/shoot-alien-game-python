@@ -169,7 +169,7 @@ def ship_fire_bullet(ship, bullets, game_settings, screen, scoreboard):
     """
         玩家开火
     """
-    if len(bullets) < game_settings.bullet_max or int(game_settings.bullet_unlimit_time) > int(time.time()):
+    if len(bullets) < game_settings.bullet_max or int(game_settings.bullet_unlimited_time) > int(time.time()):
         # 子弹未到上限或在无限子弹时间内
         is_wide = False
         is_strong = False
@@ -255,13 +255,13 @@ def check_ship_alien_bullet_collision(bullets, aliens, game_settings, screen, sh
     """
         判断玩家飞船是否被外星子弹击中
     """
-    hitted_alien_bullets = pygame.sprite.spritecollide(ship, alien_bullets, True)  # 被普通子弹击中
-    hitted_boss_bullets = pygame.sprite.spritecollide(ship, boss_bullets, True)  # 被boss子弹击中
-    if (hitted_alien_bullets or hitted_boss_bullets):  # 被击中
-        for hitted_alien_bullet in hitted_alien_bullets:
+    hit_alien_bullets = pygame.sprite.spritecollide(ship, alien_bullets, True)  # 被普通子弹击中
+    hit_boss_bullets = pygame.sprite.spritecollide(ship, boss_bullets, True)  # 被boss子弹击中
+    if (hit_alien_bullets or hit_boss_bullets):  # 被击中
+        for hit_alien_bullet in hit_alien_bullets:
             ship.life -= 1
             ship.prep_life()
-        for hitted_boss_bullet in hitted_boss_bullets:
+        for hit_boss_bullet in hit_boss_bullets:
             ship.life -= 1
             ship.prep_life()
         if ship.life <= 0:  # 飞船没血了
@@ -298,8 +298,9 @@ def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, e
                 elif alien.type == 3:
                     game_settings.strong_bullet_remain += game_settings.alien_reward[alien.type]["strong_bullet_num"]
                 elif alien.type == 4:
-                    game_settings.bullet_unlimit_time = max(game_settings.bullet_unlimit_time, time.time()) + \
-                                                        game_settings.alien_reward[alien.type]["unlimited_bullet_time"]
+                    game_settings.bullet_unlimited_time = max(game_settings.bullet_unlimited_time, time.time()) + \
+                                                          game_settings.alien_reward[alien.type][
+                                                              "unlimited_bullet_time"]
                 stats.score += game_settings.alien_points
                 check_high_score(stats, scoreboard)
                 scoreboard.prep_score()
@@ -323,8 +324,7 @@ def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, e
                     alien_ship.kill()
                     game_settings.wide_bullet_remain += game_settings.alien_ship_reward["wide_bullet_num"]
                     game_settings.strong_bullet_remain += game_settings.alien_ship_reward["strong_bullet_num"]
-                    if ship.life < ship.life_max:
-                        ship.life = ship.life_max
+                    ship.life = min(ship.life + game_settings.alien_ship_reward["ship_life_increase"], ship.life_max)
                     ship.prep_life()
                     explosions.add(Explosion(alien_ship))  # 爆炸
                     if pygame.mixer:  # 爆炸声
@@ -347,7 +347,6 @@ def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, e
                 game_settings.strong_bullet_remain += game_settings.boss_alien_reward["strong_bullet_num"]
                 if ship.life < ship.life_max:
                     ship.life = ship.life_max
-                ship.life += game_settings.boss_alien_reward["ship_life_increase"]
                 ship.prep_life()
                 explosions.add(Explosion(boss_alien))  # 爆炸
                 if pygame.mixer:  # 爆炸声
@@ -399,7 +398,7 @@ def check_events(ship, bullets, game_settings, screen, aliens, stats, play_butto
             mouse_x, mouse_y = pygame.mouse.get_pos()
             check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_button, mouse_x, mouse_y,
                               scoreboard, alien_bullets, alien_ships, boss_aliens, boss_bullets, explosions)
-        elif True:  # 判断按键
+        elif stats.game_active == True:  # 判断按键，只在游戏进行时候判断
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     ship.moving_right = True
@@ -411,7 +410,7 @@ def check_events(ship, bullets, game_settings, screen, aliens, stats, play_butto
                     ship.moving_down = True
                 if event.key == pygame.K_SPACE:
                     ship_fire_bullet(ship, bullets, game_settings, screen, scoreboard)
-                if event.key==pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE:
                     stats.game_active = False
                     pygame.mouse.set_visible(True)
             if event.type == pygame.KEYUP:
@@ -489,7 +488,7 @@ def update_screen(game_settings, screen, ship, bullets, aliens, explosions, stat
     """
         更新屏幕显示内容
     """
-    screen.blit(game_settings.backgroud, (0, 0))
+    screen.blit(game_settings.background, (0, 0))
     ship.blitme()
     explosions.draw(screen)
     for bullet in bullets.sprites():
