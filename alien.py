@@ -45,6 +45,7 @@ class Alien(Sprite):
         """
             更新
         """
+        # 移动
         self.x += self.speed * self.game_settings.fleet_direction
         self.rect.x = self.x
 
@@ -81,11 +82,12 @@ class Alien_ship(Sprite):
         """
             更新
         """
-        if time.time() - self.last_changing_direction_time >= self.changing_direction_time:
+        if time.time() - self.last_changing_direction_time >= self.changing_direction_time:  # 是否改变方向
             self.moving_direction = random.randint(-1, 1)
             self.last_changing_direction_time = time.time()
-        self.centerx += self.moving_direction * self.speed
+        self.centerx += self.moving_direction * self.speed  # 移动
         self.rect.centerx = self.centerx
+        # 不出界
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > self.screen_rect.right:

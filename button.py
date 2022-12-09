@@ -20,7 +20,7 @@ class Button():
 
     def prep_msg(self, msg):
         """
-            修改信息
+            修改显示的信息内容
         """
         self.msg_image = self.font.render(msg, True, self.text_color, self.button_color)
         self.msg_image_rect = self.msg_image.get_rect()

@@ -34,6 +34,7 @@ class Ship(Sprite):
         """
             更新
         """
+        # 判断方位且不能出界，移动
         if self.moving_right == True and self.rect.right < self.screen_rect.right:
             self.centerx += self.moving_speed
         if self.moving_left == True and self.rect.left > 0:

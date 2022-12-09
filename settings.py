@@ -9,7 +9,7 @@ class Settings():
 
     def __init__(self):
         self.screen_height = 800
-        self.screen_width = 1600
+        self.screen_width = 1500
         self.background = pygame.image.load("./data/image/background.gif")
         self.background = pygame.transform.scale(self.background, (self.screen_width, self.screen_height))
         self.ship_moving_speed = 1.5
@@ -65,6 +65,9 @@ class Settings():
         self.initialize_dynamic_settings()
 
     def increase_speed(self):
+        """
+            增加游戏难度
+        """
         self.ship_moving_speed *= self.speedup_scale
         self.bullet_speed *= self.speedup_scale
         self.alien_speed *= self.speedup_scale
@@ -79,6 +82,9 @@ class Settings():
         self.boss_bullet_min += 5
 
     def initialize_dynamic_settings(self):
+        """
+            数据设置初始化
+        """
         self.alien_speed = 1
         self.alien_ship_speed = 0.2
         self.alien_bullet_speed = 0.4

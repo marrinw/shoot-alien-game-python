@@ -60,6 +60,7 @@ class Alien_bullet(Sprite):
         """
             更新
         """
+        # 移动
         self.y += self.speed
         self.rect.y = self.y
 
@@ -102,6 +103,7 @@ class Boss_bullet(Sprite):
             self.rect.width = self.size
             self.rect.height = self.size
             self.last_grow_time = time.time()
+        # 移动
         self.y += self.speed * math.sin(self.direction)
         self.x += self.speed * math.cos(self.direction)
         self.rect.y = self.y

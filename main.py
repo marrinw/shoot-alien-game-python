@@ -18,9 +18,9 @@ def run_game():
     # 初始化
     pygame.init()
     game_settings = Settings()
-    screen = pygame.display.set_mode((game_settings.screen_width, game_settings.screen_height))
-    pygame.display.set_caption("shoot alien game")
-    if os.path.exists("./icon.ico"):
+    screen = pygame.display.set_mode((game_settings.screen_width, game_settings.screen_height))  # 屏幕大小
+    pygame.display.set_caption("shoot alien game")  # 游戏名
+    if os.path.exists("./icon.ico"):  # 游戏图标
         icon = pygame.image.load("./icon.ico")
         pygame.display.set_icon(icon)
     stats = Gamestats(game_settings)
@@ -39,14 +39,16 @@ def run_game():
 
     while True:  # 游戏开始，不断循环判断
         check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
-                     alien_ships, boss_aliens, boss_bullets, explosions)
+                     alien_ships, boss_aliens, boss_bullets, explosions)  # 判断玩家操作
         if stats.game_active:  # 游戏进行中
+            # 游戏数据信息更新
             ship.update()
             update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboard, alien_bullets, alien_ships,
                           boss_aliens, boss_bullets, explosions)
             update_bullets(bullets, aliens, game_settings, screen, ship, explosions, stats, scoreboard, alien_bullets,
                            alien_ships, boss_aliens, boss_bullets)
 
+        # 屏幕显示更新
         update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard,
                       alien_bullets, alien_ships, boss_aliens, boss_bullets)
 
