@@ -83,16 +83,17 @@ class Alien_ship(Sprite):
             更新
         """
         if time.time() - self.last_changing_direction_time >= self.changing_direction_time:  # 是否改变方向
-            self.moving_direction = random.randint(-1, 1)
+            self.moving_direction = random.randint(-2, 2)
             self.last_changing_direction_time = time.time()
         self.centerx += self.moving_direction * self.speed  # 移动
         self.rect.centerx = self.centerx
         # 不出界
         if self.rect.left < 0:
             self.rect.left = 0
+            self.centerx = float(self.rect.centerx)
         if self.rect.right > self.screen_rect.right:
             self.rect.right = self.screen_rect.right
-        self.centerx = float(self.rect.centerx)
+            self.centerx = float(self.rect.centerx)
 
     def blitme(self):
         """

@@ -36,7 +36,7 @@ class Scoreboard():
         """
             修改信息
         """
-        high_score_str = "highest score is " + str(self.stats.high_score)
+        high_score_str = self.stats.game_settings.difficulty + " mode highest score is " + str(self.stats.high_score)
         self.high_score_image = self.font.render(high_score_str, True, self.text_color, self.bg_color)
         self.high_score_rect = self.high_score_image.get_rect()
         self.high_score_rect.centerx = self.screen_rect.centerx
@@ -78,9 +78,10 @@ class Scoreboard():
         """
             画图，展示信息
         """
-        self.prep_bullets()
-        self.screen.blit(self.score_image, self.score_rect)
+        if self.stats.game_active:
+            self.prep_bullets()
+            self.screen.blit(self.score_image, self.score_rect)
+            self.screen.blit(self.level_image, self.level_rect)
+            self.screen.blit(self.ships_image, self.ships_rect)
+            self.screen.blit(self.bullets_image, self.bullets_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
-        self.screen.blit(self.level_image, self.level_rect)
-        self.screen.blit(self.ships_image, self.ships_rect)
-        self.screen.blit(self.bullets_image, self.bullets_rect)

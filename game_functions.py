@@ -7,10 +7,14 @@ from pygame.sprite import Group
 from alien import *
 from explosion import Explosion
 from game_stats import Gamestats
-from button import Button
+from button import *
 from scoreboard import Scoreboard
 import random
 import time
+import pyautogui
+import threading
+import os
+import configparser
 
 
 def create_alien(game_settings, screen, aliens, alien_number, row_number, alien_type):
@@ -138,6 +142,15 @@ def ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, al
     else:  # 游戏结束
         stats.game_active = False
         pygame.mouse.set_visible(True)
+        save_highest_score(game_settings, stats)  # 保存最高分
+        new_thread = threading.Thread(target=sendMsg, args=(stats.score,)).start()  # 弹窗
+
+
+def sendMsg(score):
+    """
+        弹窗，显示分数
+    """
+    pyautogui.alert(text="your score is " + str(score), title="score")
 
 
 def check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_button, mouse_x, mouse_y, scoreboard,
@@ -164,6 +177,33 @@ def check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_
         explosions.empty()
         ship.reset()
         create_fleet(game_settings, screen, aliens, ship, alien_ships)  # 创造普通外星人舰队，开始游戏
+
+
+def check_reset_button(stats, reset_button, mouse_x, mouse_y, scoreboard, game_settings):
+    """
+        点击重置highest score按钮
+    """
+    button_clicked = reset_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not stats.game_active:  # 重置最高分
+        stats.high_score = 0
+        for key in stats.highest_score:
+            stats.highest_score[key] = 0
+        scoreboard.prep_high_score()  # 显示
+        save_highest_score(game_settings, stats)  # 保存
+
+
+def check_difficulty_button(difficulty_button, mouse_x, mouse_y, scoreboard, game_settings, stats):
+    """
+        点击修改难度按钮
+    """
+    button_clicked = difficulty_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not stats.game_active:
+        difficulty = pyautogui.confirm(text='choose difficulty', title="difficulty",
+                                       buttons=['Easy', 'Normal', 'Hard'])  # 修改难度
+        game_settings.difficulty = difficulty
+        game_settings.initialize_dynamic_settings()  # 初始化
+        stats.stats_difficulity_score()  # 显示难度最高分
+        scoreboard.prep_high_score()
 
 
 def ship_fire_bullet(ship, bullets, game_settings, screen, scoreboard):
@@ -220,35 +260,43 @@ def boss_fire(boss_aliens, game_settings, screen, boss_bullets):
     """
     if len(boss_bullets) <= game_settings.boss_bullet_min and len(boss_aliens):
         # 有外星boss并且子弹数小于上限
-        attack_type = random.randint(0, 2)
-        # 第一种开火方式（从boss向四面八方开火）
-        if attack_type == 1:
+        attack_type = random.randint(0, 3)
+        if attack_type == 1:  # 第一种开火方式（从boss向四面八方开火）
             boss_bullets_num = random.randint(1, game_settings.boss_bullet_max - len(boss_bullets))  # 子弹数
             for i in range(0, boss_bullets_num):
                 boss_bullet_grow_rate = random.uniform(1, game_settings.boss_bullet_grow_rate_max)  # 子弹变大速率
                 boss_bullet_direction = random.uniform(0, 3.14)  # 开火方向
                 new_boss_bullet = Boss_bullet(game_settings, screen, boss_aliens.sprites()[0].rect.centerx,
                                               boss_aliens.sprites()[0].rect.centery, boss_bullet_direction,
-                                              boss_bullet_grow_rate)
+                                              boss_bullet_grow_rate, False)
                 boss_bullets.add(new_boss_bullet)
                 if pygame.mixer:
                     game_settings.alien_bullet_fire_sound.play()
-        # 第二种开火方式（从屏幕边缘发射）
-        elif attack_type == 2:
+        elif attack_type == 2:  # 第二种开火方式（从屏幕边缘发射）
             boss_bullets_num = random.randint(1, game_settings.boss_bullet_max - len(boss_bullets))
             # 开火方向，每个方向都随机开火
             for i in range(0, boss_bullets_num // 3):
                 y = random.randint(0, screen.get_rect().bottom)
-                new_boss_bullet = Boss_bullet(game_settings, screen, 0, y, 0, 1)
+                new_boss_bullet = Boss_bullet(game_settings, screen, 0, y, 0, 1, False)
                 boss_bullets.add(new_boss_bullet)
             for i in range(0, boss_bullets_num // 3):
                 y = random.randint(0, screen.get_rect().bottom)
-                new_boss_bullet = Boss_bullet(game_settings, screen, screen.get_rect().right, y, 3.14, 1)
+                new_boss_bullet = Boss_bullet(game_settings, screen, screen.get_rect().right, y, 3.14, 1, False)
                 boss_bullets.add(new_boss_bullet)
             for i in range(0, boss_bullets_num // 3):
                 x = random.randint(0, screen.get_rect().right)
-                new_boss_bullet = Boss_bullet(game_settings, screen, x, 0, 1.57, 1)
+                new_boss_bullet = Boss_bullet(game_settings, screen, x, 0, 1.57, 1, False)
                 boss_bullets.add(new_boss_bullet)
+        elif attack_type == 3:  # 第三种开火方式（从boss随机漫步开火）
+            boss_bullets_num = random.randint(1, int(game_settings.boss_bullet_max - len(boss_bullets)) // 3)  # 子弹数
+            for i in range(0, boss_bullets_num):
+                boss_bullet_direction = random.uniform(0, 6.28)  # 开火方向
+                new_boss_bullet = Boss_bullet(game_settings, screen, boss_aliens.sprites()[0].rect.centerx,
+                                              boss_aliens.sprites()[0].rect.centery, boss_bullet_direction,
+                                              1, True)
+                boss_bullets.add(new_boss_bullet)
+                if pygame.mixer:
+                    game_settings.alien_bullet_fire_sound.play()
 
 
 def check_ship_alien_bullet_collision(bullets, aliens, game_settings, screen, ship, stats, scoreboard, alien_bullets,
@@ -303,7 +351,7 @@ def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, e
                                                           game_settings.alien_reward[alien.type][
                                                               "unlimited_bullet_time"]
                 stats.score += game_settings.alien_points  # 增加分数
-                check_high_score(stats, scoreboard)  # 计分板
+                check_high_score(stats, scoreboard, game_settings)  # 计分板
                 scoreboard.prep_score()
                 explosions.add(Explosion(alien))  # 爆炸
                 if pygame.mixer:  # 爆炸声
@@ -320,7 +368,7 @@ def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, e
                 if alien_ship.life <= 0:  # 外星飞机没血
                     # 奖励
                     stats.score += game_settings.alien_ship_points  # 增加分数
-                    check_high_score(stats, scoreboard)  # 计分板
+                    check_high_score(stats, scoreboard, game_settings)  # 计分板
                     scoreboard.prep_score()
                     alien_ship.kill()
                     # 奖励
@@ -342,7 +390,7 @@ def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, e
             if boss_alien.life <= 0:  # 外星boss没血了
                 # 奖励
                 stats.score += game_settings.boss_alien_points  # 增加分数
-                check_high_score(stats, scoreboard)  # 计分板
+                check_high_score(stats, scoreboard, game_settings)  # 计分板
                 scoreboard.prep_score()
                 boss_alien.kill()
                 # 奖励
@@ -380,27 +428,42 @@ def check_bullet_alien_collision(bullets, aliens, game_settings, screen, ship, e
             create_fleet(game_settings, screen, aliens, ship, alien_ships)
 
 
-def check_high_score(stats, scoreboard):
+def check_high_score(stats, scoreboard, game_settings):
     """
         判断最高分并更新
     """
     if stats.score > stats.high_score:
         stats.high_score = stats.score
+        stats.highest_score[game_settings.difficulty] = stats.high_score
         scoreboard.prep_high_score()
 
 
+def save_highest_score(game_settings, stats):
+    """
+        保存最高分
+    """
+    config = configparser.ConfigParser()
+    for key in stats.highest_score:
+        config[key] = {'highest_score': str(stats.highest_score[key])}
+    with open(game_settings.highest_score_path, 'w') as configfile:
+        config.write(configfile)
+
+
 def check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
-                 alien_ships, boss_aliens, boss_bullets, explosions):
+                 alien_ships, boss_aliens, boss_bullets, explosions, reset_button, difficulty_button):
     """
         判断玩家操作
     """
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            save_highest_score(game_settings, stats)  # 保存最高分
             sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN:  # 是否点击按钮
             mouse_x, mouse_y = pygame.mouse.get_pos()
             check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_button, mouse_x, mouse_y,
                               scoreboard, alien_bullets, alien_ships, boss_aliens, boss_bullets, explosions)
+            check_reset_button(stats, reset_button, mouse_x, mouse_y, scoreboard, game_settings)
+            check_difficulty_button(difficulty_button, mouse_x, mouse_y, scoreboard, game_settings, stats)
         elif stats.game_active == True:  # 判断按键，只在游戏进行时候判断
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
@@ -460,12 +523,16 @@ def update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboar
     for boss_bullet in boss_bullets.copy():  # 外星boss子弹出边界，清除
         if boss_bullet.rect.bottom <= 0:
             boss_bullets.remove(boss_bullet)
+            continue
         elif boss_bullet.rect.top >= screen.get_rect().bottom:
             boss_bullets.remove(boss_bullet)
+            continue
         elif boss_bullet.rect.right <= 0:
             boss_bullets.remove(boss_bullet)
+            continue
         elif boss_bullet.rect.left >= screen.get_rect().right:
             boss_bullets.remove(boss_bullet)
+            continue
     # 判断玩家飞船是否碰到外星人，外星飞机，外星boss
     if (pygame.sprite.spritecollideany(ship, aliens)):
         ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, alien_bullets, alien_ships,
@@ -487,25 +554,28 @@ def update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboar
 
 
 def update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard,
-                  alien_bullets, alien_ships, boss_aliens, boss_bullets):
+                  alien_bullets, alien_ships, boss_aliens, boss_bullets, reset_button, difficulty_button):
     """
         更新屏幕显示内容
     """
     screen.blit(game_settings.background, (0, 0))  # 先画背景
-    ship.blitme()  # 画玩家飞船
-    explosions.draw(screen)  # 画爆炸效果
-    # 画子弹
-    for bullet in bullets.sprites():
-        bullet.draw_bullet()
-    for alien_bullet in alien_bullets.sprites():
-        alien_bullet.draw_bullet()
-    for boss_bullet in boss_bullets.sprites():
-        boss_bullet.draw_bullet()
-    # 画外星人
-    aliens.draw(screen)
-    alien_ships.draw(screen)
-    boss_aliens.draw(screen)
     scoreboard.show_score()  # 画计分板
-    if not stats.game_active:  # 游戏没开始，画开始按钮
+    if stats.game_active:  # 游戏开始
+        ship.blitme()  # 画玩家飞船
+        explosions.draw(screen)  # 画爆炸效果
+        # 画子弹
+        for bullet in bullets.sprites():
+            bullet.draw_bullet()
+        for alien_bullet in alien_bullets.sprites():
+            alien_bullet.draw_bullet()
+        for boss_bullet in boss_bullets.sprites():
+            boss_bullet.draw_bullet()
+        # 画外星人
+        aliens.draw(screen)
+        alien_ships.draw(screen)
+        boss_aliens.draw(screen)
+    else:  # 游戏没开始，画开始按钮
         play_button.draw_button()
+        reset_button.draw_button()
+        difficulty_button.draw_button()
     pygame.display.flip()  # 更新屏幕显示

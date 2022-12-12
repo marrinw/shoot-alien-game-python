@@ -2,6 +2,7 @@ import pygame
 from pygame.sprite import Sprite
 import math
 import time
+import random
 
 
 class Bullet(Sprite):
@@ -76,9 +77,10 @@ class Boss_bullet(Sprite):
         外星boss子弹
     """
 
-    def __init__(self, game_settings, screen, x, y, direction, grow_rate):
+    def __init__(self, game_settings, screen, x, y, direction, grow_rate=1, rand_dir=False):
         super(Boss_bullet, self).__init__()
         self.screen = screen
+        self.rand_dir = rand_dir
         self.rect = pygame.Rect(0, 0, game_settings.boss_bullet_size, game_settings.boss_bullet_size)
         self.rect.centerx = x
         self.rect.centery = y
@@ -92,6 +94,8 @@ class Boss_bullet(Sprite):
         self.grow_rate = grow_rate
         self.size_max = game_settings.boss_bullet_size_max
         self.last_grow_time = time.time()
+        self.last_direction_time = time.time()
+        self.direction_time = game_settings.boss_bullet_direction_time
 
     def update(self):
         """
@@ -103,6 +107,9 @@ class Boss_bullet(Sprite):
             self.rect.width = self.size
             self.rect.height = self.size
             self.last_grow_time = time.time()
+        if self.rand_dir and time.time() - self.last_direction_time >= self.direction_time:  # 随机方向
+            self.direction = random.uniform(0, 6.28)
+            self.last_direction_time = time.time()
         # 移动
         self.y += self.speed * math.sin(self.direction)
         self.x += self.speed * math.cos(self.direction)

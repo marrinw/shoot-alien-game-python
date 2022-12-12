@@ -7,7 +7,7 @@ from pygame.sprite import Group
 from alien import *
 from explosion import Explosion
 from game_stats import Gamestats
-from button import Button
+from button import *
 from scoreboard import Scoreboard
 import time
 import os
@@ -26,7 +26,9 @@ def run_game():
     stats = Gamestats(game_settings)
     scoreboard = Scoreboard(game_settings, screen, stats)
     screen.blit(game_settings.background, (0, 0))
-    play_button = Button(game_settings, screen, "Play")
+    play_button = Button_play(game_settings, screen, "Play")
+    reset_button = Button_reset(game_settings, screen, "reset score")
+    difficulty_button = Button_difficulty(game_settings, screen, "Change Difficulity")
     ship = Ship(screen, game_settings)
     bullets = Group()
     aliens = Group()
@@ -39,7 +41,7 @@ def run_game():
 
     while True:  # 游戏开始，不断循环判断
         check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
-                     alien_ships, boss_aliens, boss_bullets, explosions)  # 判断玩家操作
+                     alien_ships, boss_aliens, boss_bullets, explosions, reset_button, difficulty_button)  # 判断玩家操作
         if stats.game_active:  # 游戏进行中
             # 游戏数据信息更新
             ship.update()
@@ -50,7 +52,7 @@ def run_game():
 
         # 屏幕显示更新
         update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard,
-                      alien_bullets, alien_ships, boss_aliens, boss_bullets)
+                      alien_bullets, alien_ships, boss_aliens, boss_bullets, reset_button, difficulty_button)
 
 
 if __name__ == '__main__':
