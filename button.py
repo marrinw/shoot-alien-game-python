@@ -151,3 +151,20 @@ class Button_bgm(Button_play):
         self.rect.top = self.screen_rect.top + 104
         self.rect.left = self.screen_rect.left
         self.prep_msg(msg)
+
+
+class Button_help(Button_play):
+    """
+        显示帮助按钮
+    """
+
+    def __init__(self, game_settings, screen, msg):
+        super().__init__(game_settings, screen, msg)
+        self.width = 150
+        self.height = 25
+        self.button_color = (127, 127, 127)
+        self.font = pygame.font.SysFont(None, 20)
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.top = self.screen_rect.top + 156
+        self.rect.left = self.screen_rect.left
+        self.prep_msg(msg)

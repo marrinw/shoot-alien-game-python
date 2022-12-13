@@ -162,7 +162,7 @@ def check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_
     """
         判断开始游戏按钮是否被点击
     """
-    button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
+    button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)  # 点击按钮
     if button_clicked and not stats.game_active:  # 点击开始按钮，初始化并开始游戏
         game_settings.initialize_dynamic_settings()
         pygame.mouse.set_visible(False)
@@ -190,7 +190,7 @@ def check_reset_button(stats, reset_button, mouse_x, mouse_y, scoreboard, game_s
         点击重置highest score按钮
     """
 
-    button_clicked = reset_button.rect.collidepoint(mouse_x, mouse_y)
+    button_clicked = reset_button.rect.collidepoint(mouse_x, mouse_y)  # 点击按钮
     if button_clicked and not stats.game_active:  # 重置最高分
         stats.high_score = 0
         for key in stats.highest_score:
@@ -203,7 +203,7 @@ def check_difficulty_button(difficulty_button, mouse_x, mouse_y, scoreboard, gam
     """
         点击修改难度按钮
     """
-    button_clicked = difficulty_button.rect.collidepoint(mouse_x, mouse_y)
+    button_clicked = difficulty_button.rect.collidepoint(mouse_x, mouse_y)  # 点击按钮
     if button_clicked and not stats.game_active:
         difficulty = pyautogui.confirm(text='choose difficulty', title="difficulty",
                                        buttons=['Easy', 'Normal', 'Hard'])  # 修改难度
@@ -218,7 +218,7 @@ def check_background_button(background_button, mouse_x, mouse_y, game_settings, 
     """
         修改背景图片
     """
-    button_clicked = background_button.rect.collidepoint(mouse_x, mouse_y)
+    button_clicked = background_button.rect.collidepoint(mouse_x, mouse_y)  # 点击按钮
     if button_clicked and not stats.game_active:
         confirm = pyautogui.confirm(text='background options', title="background",
                                     buttons=['reset', 'change', 'cancel'])
@@ -248,7 +248,7 @@ def check_ship_img_button(ship_img_button, ship, mouse_x, mouse_y, game_settings
     """
         点击修改ship图片的按钮
     """
-    button_clicked = ship_img_button.rect.collidepoint(mouse_x, mouse_y)
+    button_clicked = ship_img_button.rect.collidepoint(mouse_x, mouse_y)  # 点击按钮
     if button_clicked and not stats.game_active:
         confirm = pyautogui.confirm(text='ship image options', title="ship image",
                                     buttons=['reset', 'change', 'cancel'])
@@ -273,7 +273,7 @@ def check_bgm_button(bgm_button, mouse_x, mouse_y, game_settings, stats):
     """
             点击修改bgm的按钮
         """
-    button_clicked = bgm_button.rect.collidepoint(mouse_x, mouse_y)
+    button_clicked = bgm_button.rect.collidepoint(mouse_x, mouse_y)  # 点击按钮
     if button_clicked and not stats.game_active:
         confirm = pyautogui.confirm(text='bgm options', title="bgm",
                                     buttons=['reset', 'change', 'cancel'])
@@ -295,15 +295,38 @@ def check_bgm_button(bgm_button, mouse_x, mouse_y, game_settings, stats):
 
 def check_bgm_on_button(bgm_on_button, mouse_x, mouse_y, game_settings, stats):
     """
-        开关bgm按钮
+        点击开关bgm按钮
     """
-    button_clicked = bgm_on_button.rect.collidepoint(mouse_x, mouse_y)
+    button_clicked = bgm_on_button.rect.collidepoint(mouse_x, mouse_y)  # 点击按钮
     if button_clicked and not stats.game_active:
         if game_settings.bgm_on == True:
             game_settings.bgm_on = False
         else:
             game_settings.bgm_on = True
         save_settings(game_settings)
+
+
+def check_help_button(help_button, mouse_x, mouse_y, stats):
+    """
+            点击显示帮助按钮
+        """
+    button_clicked = help_button.rect.collidepoint(mouse_x, mouse_y)  # 点击按钮
+    if button_clicked and not stats.game_active:
+        new_thread = threading.Thread(target=show_help).start()  # 弹窗，显示帮助信息
+
+
+def show_help():
+    """
+        弹窗显示帮助信息
+    """
+    pyautogui.alert(
+        text="\
+        press up down left right to move ship,\n\
+        press space to fire bullet,\n\
+        you have three bullets at one time,\n\
+        your mission is to kill aliens as many as possible\n\
+        after every two rounds, you will face a alien boss",
+        title="Help")
 
 
 def ship_fire_bullet(ship, bullets, game_settings, screen, scoreboard):
@@ -565,7 +588,7 @@ def save_settings(game_settings):
 
 def check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
                  alien_ships, boss_aliens, boss_bullets, explosions, reset_button, difficulty_button,
-                 background_button, ship_img_button, bgm_on_button, bgm_button):
+                 background_button, ship_img_button, bgm_on_button, bgm_button, help_button):
     """
         判断玩家操作
     """
@@ -584,6 +607,7 @@ def check_events(ship, bullets, game_settings, screen, aliens, stats, play_butto
             check_ship_img_button(ship_img_button, ship, mouse_x, mouse_y, game_settings, stats)
             check_bgm_on_button(bgm_on_button, mouse_x, mouse_y, game_settings, stats)
             check_bgm_button(bgm_button, mouse_x, mouse_y, game_settings, stats)
+            check_help_button(help_button, mouse_x, mouse_y, stats)
 
         elif stats.game_active == True:  # 判断按键，只在游戏进行时候判断
             if event.type == pygame.KEYDOWN:
@@ -678,7 +702,7 @@ def update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboar
 
 def update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard,
                   alien_bullets, alien_ships, boss_aliens, boss_bullets, reset_button, difficulty_button,
-                  background_button, ship_img_button, bgm_on_button, bgm_button):
+                  background_button, ship_img_button, bgm_on_button, bgm_button, help_button):
     """
         更新屏幕显示内容
     """
@@ -706,4 +730,5 @@ def update_screen(game_settings, screen, ship, bullets, aliens, explosions, stat
         ship_img_button.draw_button()
         bgm_on_button.draw_button()
         bgm_button.draw_button()
+        help_button.draw_button()
     pygame.display.flip()  # 更新屏幕显示
