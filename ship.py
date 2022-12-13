@@ -10,7 +10,7 @@ class Ship(Sprite):
     def __init__(self, screen, game_settings):
         super(Ship, self).__init__()
         self.screen = screen
-        self.image = pygame.image.load("./data/image/ship1.png")
+        self.image = pygame.image.load(game_settings.ship_img_path)
         self.image = pygame.transform.scale(self.image, (60, 80))
         self.rect = self.image.get_rect()
         self.moving_speed = game_settings.ship_moving_speed
@@ -83,3 +83,10 @@ class Ship(Sprite):
         self.life_rect = self.life_image.get_rect()
         self.life_rect.right = self.screen_rect.right
         self.life_rect.bottom = self.screen_rect.bottom
+
+    def change_img(self, img):
+        """
+            改变飞船图片
+        """
+        self.image = img
+        self.image = self.image = pygame.transform.scale(self.image, (60, 80))

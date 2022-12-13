@@ -1,0 +1,9 @@
+[Easy]
+highest_score = 0
+
+[Normal]
+highest_score = 50
+
+[Hard]
+highest_score = 0
+

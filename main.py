@@ -12,6 +12,7 @@ from scoreboard import Scoreboard
 import time
 import os
 from game_functions import *
+from pygame.locals import *
 
 
 def run_game():
@@ -27,8 +28,12 @@ def run_game():
     scoreboard = Scoreboard(game_settings, screen, stats)
     screen.blit(game_settings.background, (0, 0))
     play_button = Button_play(game_settings, screen, "Play")
-    reset_button = Button_reset(game_settings, screen, "reset score")
+    reset_button = Button_reset(game_settings, screen, "Reset score")
     difficulty_button = Button_difficulty(game_settings, screen, "Change Difficulity")
+    background_button = Button_background(game_settings, screen, "Change background")
+    bgm_on_button = Button_bgm_on(game_settings, screen)
+    bgm_button = Button_bgm(game_settings, screen, "Change bgm")
+    ship_img_button = Button_ship_img(game_settings, screen, "Change ship image")
     ship = Ship(screen, game_settings)
     bullets = Group()
     aliens = Group()
@@ -41,7 +46,8 @@ def run_game():
 
     while True:  # 游戏开始，不断循环判断
         check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
-                     alien_ships, boss_aliens, boss_bullets, explosions, reset_button, difficulty_button)  # 判断玩家操作
+                     alien_ships, boss_aliens, boss_bullets, explosions, reset_button, difficulty_button,
+                     background_button, ship_img_button, bgm_on_button,bgm_button)  # 判断玩家操作
         if stats.game_active:  # 游戏进行中
             # 游戏数据信息更新
             ship.update()
@@ -52,7 +58,8 @@ def run_game():
 
         # 屏幕显示更新
         update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard,
-                      alien_bullets, alien_ships, boss_aliens, boss_bullets, reset_button, difficulty_button)
+                      alien_bullets, alien_ships, boss_aliens, boss_bullets, reset_button, difficulty_button,
+                      background_button, ship_img_button, bgm_on_button, bgm_button)
 
 
 if __name__ == '__main__':

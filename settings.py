@@ -1,5 +1,8 @@
 import pygame
 import time
+import pickle
+import os
+import configparser
 
 
 class Settings():
@@ -10,10 +13,34 @@ class Settings():
     def __init__(self):
         self.screen_height = 800
         self.screen_width = 1500
-        self.difficulty="Normal"
-        self.speedup_dir={"Easy":1.02,"Normal":1.1,"Hard":1.15}
+        self.setting_path = "./Settings.ini"
+        self.difficulty = "Normal"
+        self.speedup_dir = {"Easy": 1.02, "Normal": 1.1, "Hard": 1.15}
         self.speedup_scale = self.speedup_dir[self.difficulty]
-        self.background = pygame.image.load("./data/image/background.gif")
+        self.background_path_origin = "./data/image/background.gif"
+        self.ship_img_path_origin = "./data/image/ship1.png"
+        self.ship_img_path = self.ship_img_path_origin
+        self.background_path = self.background_path_origin
+        self.bgm_on = True
+        self.bgm_path_origin = "./data/sound/bgm.wav"
+        self.bgm_path = self.bgm_path_origin
+        if os.path.exists(self.setting_path):  # 读取settings
+            config = configparser.ConfigParser()
+            config.read(self.setting_path)
+            temp_path = config["default"]["background"]
+            if os.path.exists(temp_path):
+                self.background_path = temp_path
+            temp_path = config["default"]["ship"]
+            if os.path.exists(temp_path):
+                self.ship_img_path = temp_path
+            temp_path = config["default"]["bgm"]
+            if os.path.exists(temp_path):
+                self.bgm_path = temp_path
+            self.bgm_on = config["default"].getboolean("bgm_on")
+
+        self.background = pygame.image.load(self.background_path)
+        self.background = pygame.transform.scale(self.background, (self.screen_width, self.screen_height))
+        self.background = pygame.image.load(self.background_path)
         self.background = pygame.transform.scale(self.background, (self.screen_width, self.screen_height))
         self.ship_moving_speed = 1.5
         self.ships_limit = 3  # 一共有多少玩家飞船
@@ -37,10 +64,11 @@ class Settings():
         self.alien_bullet_color = "green"
         self.alien_fire_bullet_random = 400
         self.alien_ships_fire_bullet_random = 600
-        if (pygame.mixer):
+        if pygame.mixer:
             self.bullet_fire_sound = pygame.mixer.Sound("./data/sound/bullet_fire.wav")
             self.boom_sound = pygame.mixer.Sound("./data/sound/boom.wav")
             self.alien_bullet_fire_sound = pygame.mixer.Sound("./data/sound/alien_bullet_fire.mp3")
+            self.bgm = pygame.mixer.Sound(self.bgm_path)
         self.alien_speed = 1
         self.fleet_drop_speed = 15
         self.fleet_direction = 1  # 1右

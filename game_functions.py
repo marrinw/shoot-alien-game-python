@@ -15,6 +15,8 @@ import pyautogui
 import threading
 import os
 import configparser
+import tkinter.filedialog
+import shutil
 
 
 def create_alien(game_settings, screen, aliens, alien_number, row_number, alien_type):
@@ -140,6 +142,8 @@ def ship_hit(game_settings, stats, screen, ship, aliens, bullets, scoreboard, al
         ship.reset()
         time.sleep(0.5)
     else:  # 游戏结束
+        if pygame.mixer:  # 结束bgm
+            game_settings.bgm.stop()
         stats.game_active = False
         pygame.mouse.set_visible(True)
         save_highest_score(game_settings, stats)  # 保存最高分
@@ -177,12 +181,15 @@ def check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_
         explosions.empty()
         ship.reset()
         create_fleet(game_settings, screen, aliens, ship, alien_ships)  # 创造普通外星人舰队，开始游戏
+        if pygame.mixer and game_settings.bgm_on:  # 播放bgm
+            game_settings.bgm.play(-1)
 
 
 def check_reset_button(stats, reset_button, mouse_x, mouse_y, scoreboard, game_settings):
     """
         点击重置highest score按钮
     """
+
     button_clicked = reset_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:  # 重置最高分
         stats.high_score = 0
@@ -200,10 +207,103 @@ def check_difficulty_button(difficulty_button, mouse_x, mouse_y, scoreboard, gam
     if button_clicked and not stats.game_active:
         difficulty = pyautogui.confirm(text='choose difficulty', title="difficulty",
                                        buttons=['Easy', 'Normal', 'Hard'])  # 修改难度
-        game_settings.difficulty = difficulty
-        game_settings.initialize_dynamic_settings()  # 初始化
-        stats.stats_difficulity_score()  # 显示难度最高分
-        scoreboard.prep_high_score()
+        if difficulty:
+            game_settings.difficulty = difficulty
+            game_settings.initialize_dynamic_settings()  # 初始化
+            stats.stats_difficulity_score()  # 显示难度最高分
+            scoreboard.prep_high_score()
+
+
+def check_background_button(background_button, mouse_x, mouse_y, game_settings, stats):
+    """
+        修改背景图片
+    """
+    button_clicked = background_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not stats.game_active:
+        confirm = pyautogui.confirm(text='background options', title="background",
+                                    buttons=['reset', 'change', 'cancel'])
+        if confirm == "reset":  # 重置背景
+            game_settings.background_path = game_settings.background_path_origin
+            game_settings.background = pygame.image.load(game_settings.background_path_origin)
+            game_settings.background = pygame.transform.scale(game_settings.background,
+                                                              (game_settings.screen_width, game_settings.screen_height))
+            save_settings(game_settings)  # 保存设置
+        elif confirm == "change":  # 自定义修改背景
+            img_path = tkinter.filedialog.askopenfilename(title="choose a background picture", filetypes=[
+                ("image", ".png .PNG .jpg .JPG .jpeg .JPEG .gif .GIF .bmp .BMP")])  # 选择图片
+            if img_path and os.path.exists(img_path):  # 判断图片是否存在
+                temp_background = pygame.image.load(img_path)  # 修改背景图片
+                temp_background = pygame.transform.scale(temp_background,
+                                                         (game_settings.screen_width, game_settings.screen_height))
+                shutil.copy(img_path, "./data/image/background2.jpg")  # 保存图片
+                game_settings.background_path = "./data/image/background2.jpg"
+                game_settings.background = pygame.image.load(game_settings.background_path)
+                game_settings.background = pygame.transform.scale(game_settings.background,
+                                                                  (game_settings.screen_width,
+                                                                   game_settings.screen_height))
+                save_settings(game_settings)  # 保存配置
+
+
+def check_ship_img_button(ship_img_button, ship, mouse_x, mouse_y, game_settings, stats):
+    """
+        点击修改ship图片的按钮
+    """
+    button_clicked = ship_img_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not stats.game_active:
+        confirm = pyautogui.confirm(text='ship image options', title="ship image",
+                                    buttons=['reset', 'change', 'cancel'])
+        if confirm == "reset":  # 重置飞船图片
+            game_settings.ship_img_path = game_settings.ship_img_path_origin
+            ship_img = pygame.image.load(game_settings.ship_img_path)
+            ship.change_img(ship_img)
+            save_settings(game_settings)  # 保存设置
+        elif confirm == "change":  # 自定义修改飞船图片
+            img_path = tkinter.filedialog.askopenfilename(title="choose a ship image", filetypes=[
+                ("image", ".png .PNG .jpg .JPG .jpeg .JPEG .gif .GIF .bmp .BMP")])  # 选择图片
+            if img_path and os.path.exists(img_path):  # 判断图片是否存在
+                ship_img = pygame.image.load(img_path)  # 修改背景图片
+                ship.change_img(ship_img)
+                game_settings.ship_img_path = img_path
+                shutil.copy(img_path, "./data/image/ship2.jpg")  # 保存图片
+                game_settings.ship_img_path = "./data/image/ship2.jpg"
+                save_settings(game_settings)  # 保存设置
+
+
+def check_bgm_button(bgm_button, mouse_x, mouse_y, game_settings, stats):
+    """
+            点击修改bgm的按钮
+        """
+    button_clicked = bgm_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not stats.game_active:
+        confirm = pyautogui.confirm(text='bgm options', title="bgm",
+                                    buttons=['reset', 'change', 'cancel'])
+        if confirm == "reset":  # 重置bgm
+            game_settings.bgm_path = game_settings.bgm_path_origin
+            if pygame.mixer:
+                game_settings.bgm = pygame.mixer.Sound(game_settings.bgm_path)
+            save_settings(game_settings)  # 保存设置
+        elif confirm == "change":  # 自定义修改bgm
+            bgm_path = tkinter.filedialog.askopenfilename(title="choose a bgm", filetypes=[
+                ("sound", ".wav .WAV .mp3 .MP3 .ogg .OGG")])  # 选择音乐文件
+            if bgm_path and os.path.exists(bgm_path):  # 判断音乐文件是否存在
+                game_settings.bgm_path = bgm_path  # 修改音乐文件
+                if pygame.mixer:
+                    game_settings.bgm = pygame.mixer.Sound(game_settings.bgm_path)
+                shutil.copy(bgm_path, "./data/sound/bgm2.wav")
+                save_settings(game_settings)  # 保存设置
+
+
+def check_bgm_on_button(bgm_on_button, mouse_x, mouse_y, game_settings, stats):
+    """
+        开关bgm按钮
+    """
+    button_clicked = bgm_on_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not stats.game_active:
+        if game_settings.bgm_on == True:
+            game_settings.bgm_on = False
+        else:
+            game_settings.bgm_on = True
+        save_settings(game_settings)
 
 
 def ship_fire_bullet(ship, bullets, game_settings, screen, scoreboard):
@@ -447,23 +547,44 @@ def save_highest_score(game_settings, stats):
         config[key] = {'highest_score': str(stats.highest_score[key])}
     with open(game_settings.highest_score_path, 'w') as configfile:
         config.write(configfile)
+    configfile.close()
+
+
+def save_settings(game_settings):
+    """
+        保存配置文件（背景图片）
+    """
+    config = configparser.ConfigParser()
+    config["default"] = {'background': game_settings.background_path, "ship": game_settings.ship_img_path,
+                         "bgm": game_settings.bgm_path,
+                         "bgm_on": game_settings.bgm_on}
+    with open(game_settings.setting_path, 'w') as configfile:
+        config.write(configfile)
+    configfile.close()
 
 
 def check_events(ship, bullets, game_settings, screen, aliens, stats, play_button, scoreboard, alien_bullets,
-                 alien_ships, boss_aliens, boss_bullets, explosions, reset_button, difficulty_button):
+                 alien_ships, boss_aliens, boss_bullets, explosions, reset_button, difficulty_button,
+                 background_button, ship_img_button, bgm_on_button, bgm_button):
     """
         判断玩家操作
     """
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             save_highest_score(game_settings, stats)  # 保存最高分
+            save_settings(game_settings)
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:  # 是否点击按钮
-            mouse_x, mouse_y = pygame.mouse.get_pos()
+            mouse_x, mouse_y = pygame.mouse.get_pos()  # 通过鼠标坐标判断是否点击按钮
             check_play_button(ship, bullets, game_settings, screen, aliens, stats, play_button, mouse_x, mouse_y,
                               scoreboard, alien_bullets, alien_ships, boss_aliens, boss_bullets, explosions)
             check_reset_button(stats, reset_button, mouse_x, mouse_y, scoreboard, game_settings)
             check_difficulty_button(difficulty_button, mouse_x, mouse_y, scoreboard, game_settings, stats)
+            check_background_button(background_button, mouse_x, mouse_y, game_settings, stats)
+            check_ship_img_button(ship_img_button, ship, mouse_x, mouse_y, game_settings, stats)
+            check_bgm_on_button(bgm_on_button, mouse_x, mouse_y, game_settings, stats)
+            check_bgm_button(bgm_button, mouse_x, mouse_y, game_settings, stats)
+
         elif stats.game_active == True:  # 判断按键，只在游戏进行时候判断
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
@@ -477,6 +598,8 @@ def check_events(ship, bullets, game_settings, screen, aliens, stats, play_butto
                 if event.key == pygame.K_SPACE:
                     ship_fire_bullet(ship, bullets, game_settings, screen, scoreboard)
                 if event.key == pygame.K_ESCAPE:  # 按esc会结束游戏但不关掉画面
+                    if pygame.mixer:  # 结束bgm
+                        game_settings.bgm.stop()
                     stats.game_active = False
                     pygame.mouse.set_visible(True)
             if event.type == pygame.KEYUP:
@@ -554,7 +677,8 @@ def update_aliens(aliens, game_settings, ship, stats, screen, bullets, scoreboar
 
 
 def update_screen(game_settings, screen, ship, bullets, aliens, explosions, stats, play_button, scoreboard,
-                  alien_bullets, alien_ships, boss_aliens, boss_bullets, reset_button, difficulty_button):
+                  alien_bullets, alien_ships, boss_aliens, boss_bullets, reset_button, difficulty_button,
+                  background_button, ship_img_button, bgm_on_button, bgm_button):
     """
         更新屏幕显示内容
     """
@@ -578,4 +702,8 @@ def update_screen(game_settings, screen, ship, bullets, aliens, explosions, stat
         play_button.draw_button()
         reset_button.draw_button()
         difficulty_button.draw_button()
+        background_button.draw_button()
+        ship_img_button.draw_button()
+        bgm_on_button.draw_button()
+        bgm_button.draw_button()
     pygame.display.flip()  # 更新屏幕显示

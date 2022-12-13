@@ -41,7 +41,7 @@ class Button_reset(Button_play):
 
     def __init__(self, game_settings, screen, msg):
         super().__init__(game_settings, screen, msg)
-        self.width = 80
+        self.width = 150
         self.height = 25
         self.button_color = (127, 127, 127)
         self.font = pygame.font.SysFont(None, 20)
@@ -63,6 +63,91 @@ class Button_difficulty(Button_play):
         self.button_color = (127, 127, 127)
         self.font = pygame.font.SysFont(None, 20)
         self.rect = pygame.Rect(0, 0, self.width, self.height)
-        self.rect.top = self.screen_rect.top
-        self.rect.left = self.screen_rect.left + 85
+        self.rect.top = self.screen_rect.top + 26
+        self.rect.left = self.screen_rect.left
+        self.prep_msg(msg)
+
+
+class Button_background(Button_play):
+    """
+        修改background按钮
+    """
+
+    def __init__(self, game_settings, screen, msg):
+        super().__init__(game_settings, screen, msg)
+        self.width = 150
+        self.height = 25
+        self.button_color = (127, 127, 127)
+        self.font = pygame.font.SysFont(None, 20)
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.top = self.screen_rect.top + 52
+        self.rect.left = self.screen_rect.left
+        self.prep_msg(msg)
+
+
+class Button_ship_img(Button_play):
+    """
+        修改ship img按钮
+    """
+
+    def __init__(self, game_settings, screen, msg):
+        super().__init__(game_settings, screen, msg)
+        self.width = 150
+        self.height = 25
+        self.button_color = (127, 127, 127)
+        self.font = pygame.font.SysFont(None, 20)
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.top = self.screen_rect.top + 78
+        self.rect.left = self.screen_rect.left
+        self.prep_msg(msg)
+
+
+class Button_bgm_on(Button_play):
+    """
+        修改ship img按钮
+    """
+
+    def __init__(self, game_settings, screen, msg=""):
+        super().__init__(game_settings, screen, msg)
+        self.width = 150
+        self.height = 25
+        self.button_color = (127, 127, 127)
+        self.font = pygame.font.SysFont(None, 20)
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.top = self.screen_rect.top + 130
+        self.rect.left = self.screen_rect.left
+        self.game_settings = game_settings
+        self.prep_msg(self.get_msg())
+
+    def get_msg(self):
+        """
+            获得显示文字
+        """
+        if self.game_settings.bgm_on == True:
+            return "Turn off bgm in game"
+        return "Turn on bgm in game"
+
+    def draw_button(self):
+        """
+            画图
+        """
+        self.prep_msg(self.get_msg())
+        self.screen.fill(self.button_color, self.rect)
+        self.screen.blit(self.msg_image, self.msg_image_rect)
+
+
+class Button_bgm(Button_play):
+    """
+        修改bgm按钮
+    """
+
+    def __init__(self, game_settings, screen, msg):
+        super().__init__(game_settings, screen, msg)
+        self.width = 150
+        self.height = 25
+        self.button_color = (127, 127, 127)
+        self.font = pygame.font.SysFont(None, 20)
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.top = self.screen_rect.top + 104
+        self.rect.left = self.screen_rect.left
         self.prep_msg(msg)
