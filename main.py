@@ -12,7 +12,6 @@ from scoreboard import Scoreboard
 import time
 import os
 from game_functions import *
-from pygame.locals import *
 
 
 def run_game():

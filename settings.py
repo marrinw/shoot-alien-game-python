@@ -100,7 +100,6 @@ class Settings():
         """
             增加游戏难度
         """
-        self.ship_moving_speed *= self.speedup_scale
         self.bullet_speed *= self.speedup_scale
         self.alien_speed *= self.speedup_scale
         self.alien_bullet_speed *= self.speedup_scale
@@ -114,11 +113,10 @@ class Settings():
             数据设置初始化
         """
         self.speedup_scale = self.speedup_dir[self.difficulty]
-        self.alien_speed = 1
-        self.alien_ship_speed = 0.2
-        self.alien_bullet_speed = 0.4
-        self.bullet_speed = 3
-        self.ship_moving_speed = 1.5
+        self.alien_speed = 1 * self.speedup_scale
+        self.alien_ship_speed = 0.2 * self.speedup_scale
+        self.alien_bullet_speed = 0.4 * self.speedup_scale
+        self.bullet_speed = 3 * self.speedup_scale
         self.boss_alien_points = 600
         self.alien_points = 50
         self.alien_ship_points = 150

@@ -32,7 +32,7 @@ class Ship(Sprite):
 
     def update(self):
         """
-            更新
+            更新移动位置
         """
         # 判断方位且不能出界，移动
         if self.moving_right == True and self.rect.right < self.screen_rect.right:

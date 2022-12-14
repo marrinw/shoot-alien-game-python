@@ -43,7 +43,7 @@ class Alien(Sprite):
 
     def update(self):
         """
-            更新
+            更新位置
         """
         # 移动
         self.x += self.speed * self.game_settings.fleet_direction
